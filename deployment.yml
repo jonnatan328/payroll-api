@@ -1,0 +1,98 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payroll-api
+  namespace: ctg-mdw
+  labels:
+    app: payroll-api
+  annotations:
+spec:
+  selector:
+    matchLabels:
+      app: payroll-api
+  template:
+    metadata:
+      name: payroll-api
+      labels:
+        app: payroll-api
+    spec:
+      containers:
+      - name: payroll-api
+        image: ctg-banistmo/api-payroll:v1.0
+        terminationMessagePath: "/dev/termination-log"
+        terminationMessagePolicy: File
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: JAVA_OPTS
+          value: "-Xmx920m -Xms920m"
+        - name: ORACLE_DB_URL
+          valueFrom:
+            secretKeyRef:
+              name: mdw-secret
+              key: mdw.datasource.url
+        - name: ORACLE_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: mdw-secret
+              key: mdw.datasource.username
+        - name: ORACLE_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mdw-secret
+              key: mdw.datasource.password
+        - name: FILES_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: payroll-files-path
+              key: paths.payroll-path
+        - name: LOG_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: payroll-files-path
+              key: paths.payroll-path
+        readinessProbe:
+          httpGet:
+              path: /payroll/api/v1/health
+              port: 2030
+          initialDelaySeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 10
+        volumeMounts:
+        - name: files-payroll
+          mountPath: /files/payroll
+      volumes:
+        - name: files-payroll
+          hostPath:
+            path: /files/payroll
+      restartPolicy: Always
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: payroll-api
+  namespace: ctg-mdw
+  labels:
+    app: payroll-api
+spec:
+  ports:
+    - name: tcp-2030-2030-j4b9q
+      protocol: TCP
+      port: 2030
+      targetPort: 2030
+  selector:
+    app: payroll-api
+  type: ClusterIP
+  sessionAffinity: None
+status:
+  loadBalancer: {}

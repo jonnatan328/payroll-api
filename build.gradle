@@ -1,0 +1,68 @@
+plugins {
+	id "org.sonarqube" version "3.0"
+	id 'org.springframework.boot' version '2.4.2'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id 'jacoco'
+	id 'maven'
+	id 'maven-publish'
+}
+
+plugins.withType(JacocoPlugin){
+	tasks['test'].finalizedBy 'jacocoTestReport'
+}
+
+jacocoTestReport {
+	reports {
+		xml.enabled true
+	}
+}
+
+sonarqube {
+	properties {
+		property 'sonar.projectName', 'ctg-ms-payroll'
+	}
+}
+
+jar {
+	archivesBaseName = 'ctg-ms-ach-api'
+
+}
+
+group = 'com.banistmo.ctg.mdw.payroll.api'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral();
+	mavenLocal()
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
+	compile 'com.h2database:h2:1.4.199'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+	compile group: 'com.oracle.database.jdbc', name: 'ojdbc10', version: '19.7.0.0'
+	compile group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
+	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
+	compile group: 'org.tinylog', name: 'tinylog-api', version: '2.2.1'
+	compile group: 'org.tinylog', name: 'tinylog-impl', version: '2.2.1'
+}
+
+test {
+	useJUnitPlatform()
+}

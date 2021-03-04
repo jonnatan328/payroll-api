@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: ctg-ms-payroll-api  
+  main:
+    allow-bean-definition-overriding: true
+  datasource: 
+#    url: ${ORACLE_DB_URL}
+#    username: ${ORACLE_DB_USER}
+#    password: ${ORACLE_DB_PASSWORD}
+    url: jdbc:oracle:thin:@localhost:1521:ORCLCDB
+    username: oracledev
+    password: passworddev
+    driver-class-name: oracle.jdbc.OracleDriver
+    hikari:
+      maximum-pool-size: 150
+      minimum-idle: 5
+  jpa:
+   database-platform: org.hibernate.dialect.Oracle10gDialect
+server:
+  port: 2030
+  servlet:
+    context-path: /payroll
+  error:
+    whitelabel:
+      enabled: false

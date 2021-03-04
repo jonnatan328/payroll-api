@@ -1,0 +1,22 @@
+## Componentes e Instalación
+
+> **API REST** de
+
+#### **API** rest services
+
+> - /gateway/swagger-ui.html
+
+### **Docker**
+
+> Comandos para ejecutar y desplegar docker
+
+    Stop current image:
+       docker stop cat-banistmo.payroll-api
+    Remove current image:
+       docker rm cat-banistmo.payroll-api
+    Build image:
+      docker build --no-cache --tag=ctg-banistmo/api-payroll:v1.0 .
+    Run image:
+      docker run -t --name ctg-banistmo.payroll-api -p 2030:2030 ctg-banistmo/api-payroll:v1.0
+    Push image:
+      docker push cat-banistmo/api-payroll:v1.0
